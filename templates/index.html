@@ -10,104 +10,142 @@
 </head>
 <body>
 
-<!-- ══ ЭКРАН ВХОДА ══ -->
-<div class="login-screen" id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">К</div>
-    <div class="login-title">ККОТИП</div>
-    <div class="login-sub">Красноярский колледж отраслевых технологий и предпринимательства</div>
+<!-- ══ ЭКРАН ВХОДА/РЕГИСТРАЦИИ ══ -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">К</div>
+    <div class="auth-title">ККОТИП</div>
+    <div class="auth-sub">Красноярский колледж отраслевых технологий<br>и предпринимательства</div>
 
-    <div class="login-tabs">
-      <button class="login-tab active" onclick="showLoginTab('select')">Из списка</button>
-      <button class="login-tab" onclick="showLoginTab('custom')">Своё имя</button>
+    <!-- Вкладки -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login-btn" onclick="showAuthTab('login')">Вход</button>
+      <button class="auth-tab" id="tab-reg-btn" onclick="showAuthTab('register')">Регистрация</button>
     </div>
 
-    <!-- Список -->
-    <div id="tab-select">
-      <div class="login-section-label">СТУДЕНТЫ</div>
-      <div class="login-list" id="login-students"></div>
-      <div class="login-section-label">ПРЕПОДАВАТЕЛИ</div>
-      <div class="login-list" id="login-teachers"></div>
-    </div>
-
-    <!-- Своё имя -->
-    <div id="tab-custom" class="hidden">
-      <div class="custom-form">
-        <div class="form-group">
-          <label class="form-label">Твоё имя *</label>
-          <input class="form-input" id="custom-name" type="text" placeholder="Например: Петя Пупкин" maxlength="40"
-                 onkeydown="if(event.key==='Enter')loginCustom()"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Кто ты?</label>
-          <div class="role-toggle">
-            <button class="role-btn active" id="role-student" onclick="setRole('student')">Студент</button>
-            <button class="role-btn" id="role-teacher" onclick="setRole('teacher')">Преподаватель</button>
-          </div>
-        </div>
-        <div class="form-group" id="group-field">
-          <label class="form-label">Группа</label>
-          <input class="form-input" id="custom-group" type="text" placeholder="Например: ИС 24-01/1" maxlength="20"/>
-        </div>
-        <div class="form-error hidden" id="form-error"></div>
-        <button class="login-submit-btn" onclick="loginCustom()">Войти →</button>
+    <!-- ВХОД -->
+    <div id="tab-login">
+      <div class="form-group">
+        <label class="form-label">Логин</label>
+        <input class="form-input" id="login-login" type="text" placeholder="Ваш логин"
+               onkeydown="if(event.key==='Enter')doLogin()"/>
       </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <div class="pass-wrap">
+          <input class="form-input" id="login-pass" type="password" placeholder="Ваш пароль"
+                 onkeydown="if(event.key==='Enter')doLogin()"/>
+          <button class="pass-eye" onclick="togglePass('login-pass',this)">👁</button>
+        </div>
+      </div>
+      <div class="form-error hidden" id="login-error"></div>
+      <button class="auth-btn" onclick="doLogin()">Войти →</button>
+
+      <div class="demo-hint">
+        <div class="demo-hint-title">Демо-аккаунты для проверки:</div>
+        <div class="demo-list">
+          <span onclick="fillLogin('marcel','marcel123')">marcel / marcel123</span>
+          <span onclick="fillLogin('stanislav','stan123')">stanislav / stan123</span>
+          <span onclick="fillLogin('danis','danis123')">danis / danis123</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- РЕГИСТРАЦИЯ -->
+    <div id="tab-register" class="hidden">
+      <div class="form-group">
+        <label class="form-label">Логин *</label>
+        <input class="form-input" id="reg-login" type="text" placeholder="Придумайте логин (мин. 3 символа)" maxlength="30"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль * <span style="color:var(--text3);font-weight:400">(мин. 6 символов)</span></label>
+        <div class="pass-wrap">
+          <input class="form-input" id="reg-pass" type="password" placeholder="Придумайте пароль"/>
+          <button class="pass-eye" onclick="togglePass('reg-pass',this)">👁</button>
+        </div>
+        <div class="pass-strength" id="pass-strength"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Полное имя *</label>
+        <input class="form-input" id="reg-name" type="text" placeholder="Фамилия Имя" maxlength="50"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Кто вы?</label>
+        <div class="role-toggle">
+          <button class="role-btn active" id="role-student" onclick="setRole('student')">Студент</button>
+          <button class="role-btn" id="role-teacher" onclick="setRole('teacher')">Преподаватель</button>
+        </div>
+      </div>
+      <div class="form-group" id="reg-group-field">
+        <label class="form-label">Группа</label>
+        <input class="form-input" id="reg-group" type="text" placeholder="Например: ИС 24-01/1" maxlength="20"/>
+      </div>
+
+      <!-- 152-ФЗ: Согласие на обработку ПД -->
+      <div class="consent-block">
+        <label class="consent-label">
+          <input type="checkbox" id="consent-check" onchange="checkConsent()"/>
+          <span>Я даю согласие на обработку моих персональных данных в соответствии с
+            <a href="/privacy" target="_blank" class="privacy-link">Политикой конфиденциальности</a>
+            (ФЗ-152 «О персональных данных»)</span>
+        </label>
+      </div>
+
+      <div class="form-error hidden" id="reg-error"></div>
+      <button class="auth-btn" id="reg-submit-btn" onclick="doRegister()" disabled>Зарегистрироваться →</button>
+      <div class="privacy-note">🔒 Мы храним только необходимые данные. Пароль хранится в зашифрованном виде.</div>
     </div>
   </div>
 </div>
 
 <!-- ══ ПРИЛОЖЕНИЕ ══ -->
 <div class="app hidden" id="app">
-
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo-block">
         <div class="logo-icon">К</div>
-        <div>
-          <div class="logo-title">ККОТИП</div>
-          <div class="logo-sub">Портал студента</div>
-        </div>
+        <div><div class="logo-title">ККОТИП</div><div class="logo-sub">Портал студента</div></div>
       </div>
-      <button class="logout-btn" onclick="logout()" title="Сменить пользователя">⇄</button>
+      <button class="logout-btn" onclick="doLogout()" title="Выйти">⇄</button>
     </div>
 
     <div class="user-card" id="user-card"></div>
 
     <nav class="nav-tabs">
       <button class="nav-tab active" data-tab="chats" onclick="switchTab('chats')">
-        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-        Чаты
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Чаты
       </button>
       <button class="nav-tab" data-tab="schedule" onclick="switchTab('schedule')">
-        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-        Расписание
+        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Расписание
+      </button>
+      <button class="nav-tab" data-tab="profile" onclick="switchTab('profile')">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>Профиль
       </button>
     </nav>
 
-    <!-- Чаты -->
     <div id="tab-chats" class="tab-content active">
-      <!-- Поиск -->
       <div class="search-bar">
         <div class="search-wrap">
           <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
           <input class="search-input" id="search-input" type="text" placeholder="Найти человека…"
-                 oninput="onSearch(this.value)" onfocus="openSearch()" />
+                 oninput="onSearch(this.value)"/>
           <button class="search-clear hidden" id="search-clear" onclick="clearSearch()">✕</button>
         </div>
-        <!-- Результаты поиска -->
         <div class="search-results hidden" id="search-results"></div>
       </div>
       <div id="contacts-list"></div>
     </div>
 
-    <!-- Расписание сайдбар -->
     <div id="tab-schedule" class="tab-content">
       <div class="sched-day-list" id="sched-day-list"></div>
+    </div>
+
+    <div id="tab-profile" class="tab-content">
+      <div class="profile-panel" id="profile-panel"></div>
     </div>
   </aside>
 
   <main class="main" id="main">
-    <!-- Welcome -->
     <div class="welcome-screen" id="welcome-screen">
       <div class="welcome-content">
         <div class="welcome-logo">К</div>
@@ -118,7 +156,6 @@
       </div>
     </div>
 
-    <!-- Chat -->
     <div class="chat-window hidden" id="chat-window">
       <div class="chat-header">
         <button class="back-btn" onclick="closeChatMobile()">
@@ -140,16 +177,12 @@
       </div>
     </div>
 
-    <!-- Schedule -->
     <div class="schedule-screen hidden" id="schedule-screen">
       <div class="schedule-screen-header">
         <button class="back-btn back-btn--show" onclick="switchTab('chats')">
           <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         </button>
-        <div>
-          <h2>Расписание занятий</h2>
-          <div class="schedule-group">Группа ИС 24-01/1</div>
-        </div>
+        <div><h2>Расписание занятий</h2><div class="schedule-group">Группа ИС 24-01/1</div></div>
       </div>
       <div class="day-tabs" id="day-tabs"></div>
       <div class="day-content" id="day-content"></div>
@@ -157,7 +190,6 @@
   </main>
 </div>
 
-<script>const FIXED_USERS = {{ fixed_users | tojson }};</script>
 <script src="/static/js/app.js"></script>
 </body>
 </html>
