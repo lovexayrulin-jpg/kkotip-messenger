@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>ККОТИП — Портал студента</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- ══ ЭКРАН ВХОДА ══ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">К</div>
+    <div class="login-title">ККОТИП</div>
+    <div class="login-sub">Казанский колледж технологий и права</div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="showLoginTab('select')">Из списка</button>
+      <button class="login-tab" onclick="showLoginTab('custom')">Своё имя</button>
+    </div>
+
+    <!-- Список -->
+    <div id="tab-select">
+      <div class="login-section-label">СТУДЕНТЫ</div>
+      <div class="login-list" id="login-students"></div>
+      <div class="login-section-label">ПРЕПОДАВАТЕЛИ</div>
+      <div class="login-list" id="login-teachers"></div>
+    </div>
+
+    <!-- Своё имя -->
+    <div id="tab-custom" class="hidden">
+      <div class="custom-form">
+        <div class="form-group">
+          <label class="form-label">Твоё имя *</label>
+          <input class="form-input" id="custom-name" type="text" placeholder="Например: Петя Пупкин" maxlength="40"
+                 onkeydown="if(event.key==='Enter')loginCustom()"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Кто ты?</label>
+          <div class="role-toggle">
+            <button class="role-btn active" id="role-student" onclick="setRole('student')">Студент</button>
+            <button class="role-btn" id="role-teacher" onclick="setRole('teacher')">Преподаватель</button>
+          </div>
+        </div>
+        <div class="form-group" id="group-field">
+          <label class="form-label">Группа</label>
+          <input class="form-input" id="custom-group" type="text" placeholder="Например: ИС 24-01/1" maxlength="20"/>
+        </div>
+        <div class="form-error hidden" id="form-error"></div>
+        <button class="login-submit-btn" onclick="loginCustom()">Войти →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ПРИЛОЖЕНИЕ ══ -->
+<div class="app hidden" id="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-block">
+        <div class="logo-icon">К</div>
+        <div>
+          <div class="logo-title">ККОТИП</div>
+          <div class="logo-sub">Портал студента</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Сменить пользователя">⇄</button>
+    </div>
+
+    <div class="user-card" id="user-card"></div>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="chats" onclick="switchTab('chats')">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+        Чаты
+      </button>
+      <button class="nav-tab" data-tab="schedule" onclick="switchTab('schedule')">
+        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        Расписание
+      </button>
+    </nav>
+
+    <!-- Чаты -->
+    <div id="tab-chats" class="tab-content active">
+      <!-- Поиск -->
+      <div class="search-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input class="search-input" id="search-input" type="text" placeholder="Найти человека…"
+                 oninput="onSearch(this.value)" onfocus="openSearch()" />
+          <button class="search-clear hidden" id="search-clear" onclick="clearSearch()">✕</button>
+        </div>
+        <!-- Результаты поиска -->
+        <div class="search-results hidden" id="search-results"></div>
+      </div>
+      <div id="contacts-list"></div>
+    </div>
+
+    <!-- Расписание сайдбар -->
+    <div id="tab-schedule" class="tab-content">
+      <div class="sched-day-list" id="sched-day-list"></div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <!-- Welcome -->
+    <div class="welcome-screen" id="welcome-screen">
+      <div class="welcome-content">
+        <div class="welcome-logo">К</div>
+        <h1 class="welcome-title">ККОТИП</h1>
+        <p class="welcome-sub">Казанский колледж технологий и права</p>
+        <div class="welcome-greeting" id="welcome-greeting"></div>
+        <div class="today-schedule" id="today-block"></div>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-window hidden" id="chat-window">
+      <div class="chat-header">
+        <button class="back-btn" onclick="closeChatMobile()">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <div class="chat-avatar" id="chat-avatar-el"></div>
+        <div class="chat-header-info">
+          <div class="chat-header-name" id="chat-name-el"></div>
+          <div class="chat-header-status" id="chat-status-el"></div>
+        </div>
+      </div>
+      <div class="messages-area" id="messages-area"></div>
+      <div class="input-bar">
+        <input class="msg-input" id="msg-input" type="text" placeholder="Написать сообщение…"
+               onkeydown="if(event.key==='Enter')sendMessage()"/>
+        <button class="send-btn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="schedule-screen hidden" id="schedule-screen">
+      <div class="schedule-screen-header">
+        <button class="back-btn back-btn--show" onclick="switchTab('chats')">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <div>
+          <h2>Расписание занятий</h2>
+          <div class="schedule-group">Группа ИС 24-01/1</div>
+        </div>
+      </div>
+      <div class="day-tabs" id="day-tabs"></div>
+      <div class="day-content" id="day-content"></div>
+    </div>
+  </main>
+</div>
+
+<script>const FIXED_USERS = {{ fixed_users | tojson }};</script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
